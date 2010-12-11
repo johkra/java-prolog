@@ -13,7 +13,7 @@ public class Rules {
 
 	public Boolean is(Fact f, List<Term> head) {
 		for(Fact rule: rules) {
-			if ((rule == f) && (f.getHead().equals(head))) {
+			if ((rule.equals(f)) && (f.getHead().equals(head))) {
 				return true;
 			}
 		}

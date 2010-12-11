@@ -15,13 +15,14 @@ public class Test {
 		List<Term> head4 = new ArrayList<Term>();
 		head4.add(a3);
 
-		Fact cat = new Fact(head);
+		Fact cat = new Fact("cat", head);
+		Fact cat2 = new Fact("cat", head3);
 
 		Rules rules = new Rules();
 		rules.addRule(cat);
 		System.out.println("Is Tom a cat ?- " + rules.is(cat, head));
-		System.out.println("Is Tom a cat ?- " + rules.is(cat, head2));
+		System.out.println("Is Tom a cat ?- " + rules.is(cat2, head2));
 		System.out.println("Is Tom a cat ?- " + rules.is(cat, head3));
-		System.out.println("Is Jerry a cat ?- " + rules.is(cat, head4));
+		System.out.println("Is Jerry a cat ?- " + rules.is(cat2, head4));
 	}
 }
