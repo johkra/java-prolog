@@ -17,12 +17,26 @@ public class Test {
 
 		Fact cat = new Fact("cat", head);
 		Fact cat2 = new Fact("cat", head3);
+		Fact mouse = new Fact("mouse", head4);
 
 		Rules rules = new Rules();
 		rules.addRule(cat);
-		System.out.println("Is Tom a cat ?- " + rules.is(cat, head));
-		System.out.println("Is Tom a cat ?- " + rules.is(cat2, head2));
-		System.out.println("Is Tom a cat ?- " + rules.is(cat, head3));
-		System.out.println("Is Jerry a cat ?- " + rules.is(cat2, head4));
+		rules.addRule(mouse);
+
+		test(cat, head);
+		test(cat2, head);
+		test(cat, head2);
+		test(cat2, head2);
+		test(cat, head3);
+		test(cat2, head3);
+		test(cat, head4);
+		test(mouse, head4);
+		test(mouse, head);
+	}
+
+	public static void test(Fact f, List<Term> head) {
+		Rules rules = new Rules();
+		System.out.println("Is " + head.get(0).getName() + " a " + f.getName() + " ?- " +
+				rules.is(f, head));
 	}
 }
