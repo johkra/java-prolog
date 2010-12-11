@@ -11,13 +11,18 @@ public class Rules {
 		rules.add(f);
 	}
 
-	public Boolean is(Fact f, List<Term> head) {
+	public boolean is(Fact f, List<Term> head) {
+		boolean result = false;
 		for(Fact rule: rules) {
 			if ((rule.equals(f)) && (f.getHead().equals(head))) {
-				return true;
+				Term first = f.getHead().get(0);
+				if (first instanceof Variable) {
+					System.out.println(first.getName() + " = " + rule.getHead().get(0).getName());
+				}
+				result = true;
 			}
 		}
-		return false;
+		return result;
 	}
 
 }
