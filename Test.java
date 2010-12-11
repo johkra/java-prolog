@@ -1,55 +1,48 @@
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
 public class Test {
+	public static List<Term> List(Term ... elements) {
+		List<Term> list = new ArrayList<Term>();
+		for(Term t: Arrays.asList(elements)) {
+			list.add(t);
+		}
+		return list;
+	}
+	public static Atom atom(String name) {
+		return new Atom(name);
+	}
+	public static Variable var(String name) {
+		return new Variable(name);
+	}
+
 	public static void main(String[] args) {
-		Atom a = new Atom("Tom");
-		List<Term> head = new ArrayList<Term>();
-		head.add(a);
-		List<Term> head2 = new ArrayList<Term>();
-		head2.add(a);
-		Atom a2 = new Atom("Tom");
-		List<Term> head3 = new ArrayList<Term>();
-		head3.add(a2);
-		Atom a3 = new Atom("Jerry");
-		List<Term> head4 = new ArrayList<Term>();
-		head4.add(a3);
-		Atom a4 = new Atom("Micky");
-		List<Term> head6 = new ArrayList<Term>();
-		head6.add(a4);
+		Fact cat = new Fact("cat", List(atom("Tom")) );
+		Fact cat2 = new Fact("cat", List(atom("Tom")) );
+		Fact mouse = new Fact("mouse", List(atom("Jerry")) );
+		Fact mouse3 = new Fact("mouse", List(atom("Micky")) );
 
-		Variable v1 = new Variable("X");
-		List<Term> head5 = new ArrayList<Term>();
-		head5.add(v1);
-		Variable v2 = new Variable("Y");
-		List<Term> head7 = new ArrayList<Term>();
-		head7.add(v2);
-
-		Fact cat = new Fact("cat", head);
-		Fact cat2 = new Fact("cat", head3);
-		Fact mouse = new Fact("mouse", head4);
-		Fact mouse3 = new Fact("mouse", head6);
-
-		Fact mouse2 = new Fact("mouse", head5);
-		Fact cat3 = new Fact("cat", head7);
+		Fact mouse2 = new Fact("mouse", List(var("X")) );
+		Fact cat3 = new Fact("cat", List(var("Y")) );
 
 		Rules rules = new Rules();
 		rules.addRule(cat);
 		rules.addRule(mouse);
 		rules.addRule(mouse3);
 
-		test(cat, head);
-		test(cat2, head);
-		test(cat, head2);
-		test(cat2, head2);
-		test(cat, head3);
-		test(cat2, head3);
-		test(cat, head4);
-		test(mouse, head4);
-		test(mouse, head);
+		test(cat, List(atom("Tom")) );
+		test(cat2, List(atom("Tom")) );
+		test(cat, List(atom("Tom")) );
+		test(cat2, List(atom("Tom")) );
+		test(cat, List(atom("Tom")) );
+		test(cat2, List(atom("Tom")) );
+		test(cat, List(atom("Jerry")) );
+		test(mouse, List(atom("Jerry")) );
+		test(mouse, List(atom("Tom")) );
 
-		rules.is(mouse2, head5);
-		rules.is(cat3, head7);
+		rules.is(mouse2, List(var("X")) );
+		rules.is(cat3, List(var("Y")) );
 	}
 
 	public static void test(Fact f, List<Term> head) {
