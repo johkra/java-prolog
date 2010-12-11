@@ -10,11 +10,7 @@ public class Atom implements Term {
 	}
 
 	public boolean equals(Object o) {
-		if (!(o instanceof Atom)) {
-			return false;
-		}
-		Atom a = (Atom) o;
-
-		return a.getName().equals(this.name);
+		return (o instanceof Atom) && 
+			((Atom)o).getName().equals(this.name);
 	}
 }
