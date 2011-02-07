@@ -93,7 +93,7 @@ public class Prolog {
             String destArg = destTerm.getArgs()[i];
             String srcVal = srcArg;
             if ((srcArg.length() == 1) && (srcArg.charAt(0) >= 'A') && (srcArg.charAt(0) <= 'Z')) {
-                srcVal = (String) destEnv.get(destArg);
+                srcVal = (String) srcEnv.get(srcArg);
             }
             if (srcVal != null) {
                 if ((destArg.length() == 1) && (destArg.charAt(0) >= 'A') && (destArg.charAt(0) <= 'Z')) {
