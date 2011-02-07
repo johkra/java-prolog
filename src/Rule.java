@@ -48,9 +48,13 @@ public class Rule {
 
     @Override
     public String toString() {
-        return "Rule{" +
-                "head=" + head +
-                ", goals=" + goals +
-                '}';
+        String goalsString = "";
+        for(int i = 0; i < goals.size(); i++) {
+            if (i != 0) {
+                goalsString += ", ";
+            }
+            goalsString += goals.get(i);
+        }
+        return head + " :- " + goalsString;
     }
 }

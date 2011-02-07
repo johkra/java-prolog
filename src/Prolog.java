@@ -81,6 +81,10 @@ public class Prolog {
         }
     }
 
+    private static Boolean isVariable(String arg) {
+        return ((arg.length() == 1) && (arg.charAt(0) >= 'A') && (arg.charAt(0) <= 'Z'));
+    }
+
     private static Boolean unify(Term srcTerm, HashMap<String, String> srcEnv, Term destTerm, HashMap<String, String> destEnv) {
         if (srcTerm.getArgs().length != destTerm.getArgs().length) {
             return false;
@@ -92,13 +96,13 @@ public class Prolog {
             String srcArg = srcTerm.getArgs()[i];
             String destArg = destTerm.getArgs()[i];
             String srcVal = srcArg;
-            if ((srcArg.length() == 1) && (srcArg.charAt(0) >= 'A') && (srcArg.charAt(0) <= 'Z')) {
-                srcVal = (String) srcEnv.get(srcArg);
+            if (isVariable(srcArg)) {
+                srcVal = srcEnv.get(srcArg);
             }
             if (srcVal != null) {
-                if ((destArg.length() == 1) && (destArg.charAt(0) >= 'A') && (destArg.charAt(0) <= 'Z')) {
+                if (isVariable(destArg)) {
                     String destVal = null;
-                    destVal = (String) destEnv.get(destArg);
+                    destVal = destEnv.get(destArg);
                     if (destVal == null) {
                         destEnv.put(destArg, srcVal);
                     } else if (!destVal.equals(srcVal)) {
@@ -111,14 +115,6 @@ public class Prolog {
         }
         return true;
     }
-
-//        if srcVal :    # constant or defined Variable in source
-//            if destArg <= 'Z' :  # Variable in destination
-//                destVal = destEnv.get(destArg)
-//                if not destVal : destEnv[destArg] = srcVal  # Unify !
-//                elif destVal != srcVal : return 0           # Won't unify
-//            elif     destArg != srcVal : return 0           # Won't unify
-//    return 1
 
     private static void search(Term term) throws ParseException {
         Goal goal = new Goal(new Rule("all(done):-x(y)"), null);
@@ -142,21 +138,24 @@ public class Prolog {
                     continue;
                 }
                 Goal parent = c.getParent().clone();
-                unify(c.getRule().getHead(), c.getEnv(), parent.getRule().getGoals().get(parent.getInx()), parent.getEnv());
+                Term head = c.getRule().getHead();
+                Term currentGoal = parent.getRule().getGoals().get(parent.getInx());
+                unify(head, c.getEnv(), currentGoal, parent.getEnv());
                 parent.setInx(parent.getInx() + 1);
                 queue.add(parent);
                 continue;
             }
             term = c.getRule().getGoals().get(c.getInx());
             for (Rule rule : rules) {
-                if (!rule.getHead().getPred().equals(term.getPred())) {
+                Term head = rule.getHead();
+                if (!head.getPred().equals(term.getPred())) {
                     continue;
                 }
-                if (rule.getHead().getArgs().length != term.getArgs().length) {
+                if (head.getArgs().length != term.getArgs().length) {
                     continue;
                 }
                 Goal child = new Goal(rule, c);
-                if (unify(term, c.getEnv(), rule.getHead(), child.getEnv())) {
+                if (unify(term, c.getEnv(), head, child.getEnv())) {
                     queue.add(child);
                 }
             }

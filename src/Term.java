@@ -46,9 +46,11 @@ public class Term {
 
     @Override
     public String toString() {
-        return "Term{" +
-                "pred='" + pred + '\'' +
-                ", args=" + (args == null ? null : Arrays.asList(args)) +
-                '}';
+        String argsString = "";
+        if (args != null) {
+            argsString = Arrays.asList(args).toString();
+            argsString = argsString.substring(1, argsString.length() - 1);
+        }
+        return pred + '(' + argsString + ')';
     }
 }

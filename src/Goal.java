@@ -66,8 +66,8 @@ public class Goal {
 
     @Override
     public String toString() {
-        return "Goal{" +
-                "rule=" + rule +
+        return "Goal{" + rule +
+                "; parent=" + (parent != null) +
                 ", inx=" + inx +
                 ", env=" + env +
                 '}';
