@@ -1,5 +1,7 @@
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * User: Johannes Krampf <johkra@gmail.com>
@@ -8,21 +10,47 @@ import java.util.Arrays;
 
 public class Term {
     private String pred;
-    private String[] args;
+    private List<Term> args;
 
-    public Term(String term) throws ParseException {
-        term = term.replace(" ", "");
-        if (term.charAt(term.length() - 1) != ')') {
-            throw new ParseException("Syntax error in term: '" + term + "' missing closing bracket", -1);
-
+    public Term(String s, List<Term> args) throws ParseException {
+        if (args != null) {
+            pred = s;
+            this.args = args;
+        } else if (s.charAt(s.length() - 1) == ']') {
+            List<String> flds = Util.split(s.substring(1, s.length() - 1), ',', true);
+            List<String> flds2 = Util.split(s.substring(1, s.length() - 1), '|', true);
+            if (flds2.size() > 1) {
+                this.pred = ".";
+                this.args = new ArrayList<Term>();
+                for (String str : flds2) {
+                    this.args.add(new Term(str, null));
+                }
+            } else {
+                Term l = new Term(".", null);
+                for (int i = flds.size() - 1; i >= 0; i--) {
+                    List<Term> temp = new ArrayList<Term>();
+                    temp.add(new Term(flds.get(i), null));
+                    temp.add(l);
+                    l = new Term(".", temp);
+                }
+                this.pred = l.pred;
+                this.args = l.args;
+            }
+        } else if (s.charAt(s.length() - 1) == ')') {
+            List<String> flds = Util.split(s, '(', false);
+            if (flds.size() != 2) {
+                throw new ParseException("Syntax error in term: '" + s + "'", -1);
+            }
+            this.pred = flds.get(0);
+            this.args = new ArrayList<Term>();
+            for (String str : Util.split(flds.get(1).substring(0, flds.get(1).length() - 1), ',', true)) {
+                this.args.add(new Term(str, null));
+            }
+        } else {
+            this.pred = s;
+            this.args = new ArrayList<Term>();
         }
 
-        String[] flds = term.substring(0, term.length() - 1).split("\\(");
-        if (flds.length != 2) {
-            throw new ParseException("Syntax error in term: " + term, -1);
-        }
-        pred = flds[0];
-        args = flds[1].split(",");
     }
 
     private Term() {
@@ -33,24 +61,39 @@ public class Term {
         return pred;
     }
 
-    public String[] getArgs() {
+    public List<Term> getArgs() {
         return args;
     }
 
     public Term clone() {
         Term clone = new Term();
         clone.pred = pred;
-        clone.args = args.clone();
+        clone.args = new ArrayList<Term>(args);
         return clone;
     }
 
     @Override
     public String toString() {
-        String argsString = "";
-        if (args != null) {
-            argsString = Arrays.asList(args).toString();
-            argsString = argsString.substring(1, argsString.length() - 1);
+        if (this.getPred().equals(".")) {
+            if (this.getArgs().size() == 0) {
+                return "[]";
+            }
+            Term nxt = this.getArgs().get(1);
+            if (nxt.getPred().equals(".") && (nxt.getArgs().size() == 0)) {
+                return "[" + this.getArgs().get(0) + "]";
+            } else if (nxt.getPred().equals(".")) {
+                return "[" + this.getArgs().get(0) + "," + nxt.toString().substring(1, nxt.toString().length() - 1) + "]";
+            } else {
+                return "[" + this.getArgs().get(0) + "|" + nxt + "]";
+            }
+        } else if (this.getArgs().size() > 0) {
+            String argsString = "";
+            if (args != null) {
+                argsString = Arrays.asList(args).toString();
+                argsString = argsString.substring(1, argsString.length() - 1);
+            }
+            return this.getPred() + "(" + argsString + ")";
         }
-        return pred + '(' + argsString + ')';
+        return this.getPred();
     }
 }

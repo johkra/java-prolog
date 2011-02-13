@@ -12,13 +12,13 @@ public class Rule {
 
     public Rule(String rule) throws ParseException {
         String[] flds = rule.split(":-");
-        head = new Term(flds[0]);
+        head = new Term(flds[0], null);
         goals = new ArrayList<Term>();
 
         if (flds.length == 2) {
             flds = flds[1].replace("),", ");").split(";");
             for (String fld : flds) {
-                goals.add(new Term(fld));
+                goals.add(new Term(fld, null));
             }
         }
     }

@@ -7,17 +7,17 @@ import java.util.HashMap;
 public class Goal {
     private Rule rule;
     private Goal parent;
-    private HashMap<String, String> env;
+    private HashMap<String, Term> env;
     private int inx;
 
     public Goal(Rule rule, Goal parent) {
         this.rule = rule;
         this.parent = parent;
-        this.env = new HashMap<String, String>();
+        this.env = new HashMap<String, Term>();
         this.inx = 0;
     }
 
-    public Goal(Rule rule, Goal parent, HashMap<String, String> env) {
+    public Goal(Rule rule, Goal parent, HashMap<String, Term> env) {
         this.rule = rule;
         this.parent = parent;
         this.env = env;
@@ -43,7 +43,7 @@ public class Goal {
         this.parent = parent;
     }
 
-    public HashMap<String, String> getEnv() {
+    public HashMap<String, Term> getEnv() {
         return env;
     }
 
@@ -59,7 +59,7 @@ public class Goal {
         Goal clone = new Goal();
         clone.rule = rule.clone();
         clone.parent = parent;
-        clone.env = new HashMap<String, String>(env);
+        clone.env = new HashMap<String, Term>(env);
         clone.inx = inx;
         return clone;
     }

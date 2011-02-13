@@ -9,12 +9,12 @@ import java.util.HashMap;
  *
  * This is a translation of prolog1.py written by Chris Meyers under a copyleft license.
  *
- * See http://web.archive.org/web/20071014055005/ibiblio.org/obp/py4fun/prolog/prolog1.html for the code and explanations.
+ * See http://web.archive.org/web/20071014055005/ibiblio.org/obp/py4fun/prolog/prolog2.html for the code and explanations.
  */
 public class Prolog {
     private static ArrayList<Rule> rules = new ArrayList<Rule>();
     private static Boolean trace = false;
-//      sent      = None
+    private static String indent = "";
 
     public static void main(String[] args) {
         for (String file : args) {
@@ -62,7 +62,7 @@ public class Prolog {
                             System.out.println(rule);
                         }
                     } else if (punc == '?') {
-                        search(new Term(line));
+                        search(new Term(line, null));
                     } else {
                         rules.add(new Rule(line));
                     }
@@ -81,39 +81,58 @@ public class Prolog {
         }
     }
 
-    private static Boolean isVariable(String arg) {
-        return ((arg.length() == 1) && (arg.charAt(0) >= 'A') && (arg.charAt(0) <= 'Z'));
+    private static Boolean isVariable(Term term) {
+        return ((term.getArgs().size() == 0) && (term.getPred().charAt(0) >= 'A') && (term.getPred().charAt(0) <= 'Z'));
+    }
+    private static Boolean isConstant(Term term) {
+        return ((term.getArgs().size() == 0) && ((term.getPred().charAt(0) < 'A') ||(term.getPred().charAt(0) > 'Z')));
     }
 
-    private static Boolean unify(Term srcTerm, HashMap<String, String> srcEnv, Term destTerm, HashMap<String, String> destEnv) {
-        if (srcTerm.getArgs().length != destTerm.getArgs().length) {
-            return false;
+    private static Boolean unify(Term src, HashMap<String, Term> srcEnv, Term dest, HashMap<String, Term> destEnv) throws ParseException {
+        if (trace) {
+            System.out.println(indent + "Unify " + src + " " + srcEnv + " to " + dest + " " +destEnv);
         }
-        if (!srcTerm.getPred().equals(destTerm.getPred())) {
-            return false;
+        indent += "  ";
+        if (src.getPred().equals("_") || dest.getPred().equals("_")) {
+            return sts(true, "Wildcard");
         }
-        for (int i = 0; i < srcTerm.getArgs().length; i++) {
-            String srcArg = srcTerm.getArgs()[i];
-            String destArg = destTerm.getArgs()[i];
-            String srcVal = srcArg;
-            if (isVariable(srcArg)) {
-                srcVal = srcEnv.get(srcArg);
-            }
-            if (srcVal != null) {
-                if (isVariable(destArg)) {
-                    String destVal = null;
-                    destVal = destEnv.get(destArg);
-                    if (destVal == null) {
-                        destEnv.put(destArg, srcVal);
-                    } else if (!destVal.equals(srcVal)) {
-                        return false;
-                    }
-                } else if (!destArg.equals(srcVal)) {
-                    return false;
-                }
+        if (isVariable(src)) {
+            Term srcVal = eval(src, srcEnv);
+            if (srcVal == null) {
+                return sts(true, "Src unset");
+            } else {
+                return sts(unify(srcVal, srcEnv, dest, destEnv), "Unify to Src Value");
             }
         }
-        return true;
+        if (isVariable(dest)) {
+            Term destVal = eval(dest, destEnv);
+            if (destVal != null) {
+                return sts(unify(src,srcEnv,destVal,destEnv), "Unify to Dest value");
+            } else {
+                destEnv.put(dest.getPred(), eval(src, srcEnv));
+                return sts(true, "Dest updated");
+            }
+        } else if (!src.getPred().equals(dest.getPred())) {
+            return sts(false, "Diff predicates");
+        } else if (src.getArgs().size() != dest.getArgs().size()) {
+            return sts(false, "Diff # args");
+        }
+        HashMap<String, Term> dde = new HashMap<String, Term>(destEnv);
+        for (int i = 0; i < src.getArgs().size(); i++) {
+            if(!unify(src.getArgs().get(i), srcEnv, dest.getArgs().get(i), dde)) {
+                return sts(false, "Arg doesn't unify");
+            }
+        }
+        destEnv.putAll(dde);
+        return sts(true, "All args unify");
+    }
+
+    private static Boolean sts(Boolean ok, String why) {
+        indent = indent.substring(2);
+        if (trace) {
+            System.out.println(indent + (ok ? "Yes" : "No") + " " + why);
+        }
+        return ok;
     }
 
     private static void search(Term term) throws ParseException {
@@ -151,7 +170,7 @@ public class Prolog {
                 if (!head.getPred().equals(term.getPred())) {
                     continue;
                 }
-                if (head.getArgs().length != term.getArgs().length) {
+                if (head.getArgs().size() != term.getArgs().size()) {
                     continue;
                 }
                 Goal child = new Goal(rule, c);
@@ -160,5 +179,27 @@ public class Prolog {
                 }
             }
         }
+    }
+
+    private static Term eval(Term term, HashMap<String, Term> env) throws ParseException {
+        if (isConstant(term)) {
+            return term;
+        }
+        if (isVariable(term)) {
+            Term ans = env.get(term.getPred());
+            if (ans == null) {
+                return null;
+            }
+            return eval(ans, env);
+        }
+        ArrayList<Term> args = new ArrayList<Term>();
+        for(Term arg: term.getArgs()) {
+            Term a  = eval(arg, env);
+            if (a == null) {
+                return null;
+            }
+            args.add(a);
+        }
+        return new Term(term.getPred(), args);
     }
 }
