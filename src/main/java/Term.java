@@ -13,6 +13,9 @@ public class Term {
     private List<Term> args;
 
     public Term(String s, List<Term> args) throws ParseException {
+        if ((s == null) || (s.length() == 0)) {
+            throw(new ParseException("Predicate mustn't be empty or null", -1));
+        }
         if (args != null) {
             pred = s;
             this.args = args;

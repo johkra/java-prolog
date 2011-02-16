@@ -11,10 +11,12 @@ import java.util.HashMap;
  *
  * See http://web.archive.org/web/20071014055005/ibiblio.org/obp/py4fun/prolog/prolog2.html for the code and explanations.
  */
-public class Prolog {
+public final class Prolog {
     private static ArrayList<Rule> rules = new ArrayList<Rule>();
     private static Boolean trace = false;
     private static String indent = "";
+
+    private Prolog() {}
 
     public static void main(String[] args) {
         for (String file : args) {
@@ -164,17 +166,17 @@ public class Prolog {
                 queue.add(parent);
                 continue;
             }
-            term = c.getRule().getGoals().get(c.getInx());
+            Term currentGoal = c.getRule().getGoals().get(c.getInx());
             for (Rule rule : rules) {
                 Term head = rule.getHead();
-                if (!head.getPred().equals(term.getPred())) {
+                if (!head.getPred().equals(currentGoal.getPred())) {
                     continue;
                 }
-                if (head.getArgs().size() != term.getArgs().size()) {
+                if (head.getArgs().size() != currentGoal.getArgs().size()) {
                     continue;
                 }
                 Goal child = new Goal(rule, c);
-                if (unify(term, c.getEnv(), head, child.getEnv())) {
+                if (unify(currentGoal, c.getEnv(), head, child.getEnv())) {
                     queue.add(child);
                 }
             }
