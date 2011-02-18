@@ -11,7 +11,6 @@ public class TermTest {
     public void testSuccess() throws Exception {
         Term term = new Term("pred(args)", null);
 
-
         assert(term.getPred().equals("pred"));
         assert(term.getArgs().get(0).getPred().equals("args"));
     }

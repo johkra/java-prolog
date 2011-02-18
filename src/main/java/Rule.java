@@ -16,7 +16,7 @@ public class Rule {
         goals = new ArrayList<Term>();
 
         if (flds.length == 2) {
-            flds = flds[1].replace("),", ");").split(";");
+            flds = flds[1].split(",");
             for (String fld : flds) {
                 goals.add(new Term(fld, null));
             }

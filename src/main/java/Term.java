@@ -2,6 +2,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * User: Johannes Krampf <johkra@gmail.com>
@@ -14,14 +15,24 @@ public class Term {
 
     public Term(String s, List<Term> args) throws ParseException {
         if ((s == null) || (s.length() == 0)) {
-            throw(new ParseException("Predicate mustn't be empty or null", -1));
+            throw (new ParseException("Predicate mustn't be empty or null", -1));
+        }
+        Map.Entry<String, List<String>> parts = null;
+        if (args == null) {
+            parts = Util.splitInfix(s);
         }
         if (args != null) {
             pred = s;
             this.args = args;
+        } else if (parts != null) {
+            this.pred = parts.getKey();
+            this.args = new ArrayList<Term>();
+            for (String str : parts.getValue()) {
+                this.args.add(new Term(str, null));
+            }
         } else if (s.charAt(s.length() - 1) == ']') {
-            List<String> flds = Util.split(s.substring(1, s.length() - 1), ',', true);
-            List<String> flds2 = Util.split(s.substring(1, s.length() - 1), '|', true);
+            List<String> flds = Util.split(s.substring(1, s.length() - 1), ",", true);
+            List<String> flds2 = Util.split(s.substring(1, s.length() - 1), "|", true);
             if (flds2.size() > 1) {
                 this.pred = ".";
                 this.args = new ArrayList<Term>();
@@ -40,13 +51,13 @@ public class Term {
                 this.args = l.args;
             }
         } else if (s.charAt(s.length() - 1) == ')') {
-            List<String> flds = Util.split(s, '(', false);
+            List<String> flds = Util.split(s.substring(0,s.length() - 1), "(", false);
             if (flds.size() != 2) {
                 throw new ParseException("Syntax error in term: '" + s + "'", -1);
             }
             this.pred = flds.get(0);
             this.args = new ArrayList<Term>();
-            for (String str : Util.split(flds.get(1).substring(0, flds.get(1).length() - 1), ',', true)) {
+            for (String str : Util.split(flds.get(1).substring(0, flds.get(1).length() - 1), ",", true)) {
                 this.args.add(new Term(str, null));
             }
         } else {
@@ -95,7 +106,7 @@ public class Term {
                 argsString = Arrays.asList(args).toString();
                 argsString = argsString.substring(1, argsString.length() - 1);
             }
-            return this.getPred() + "(" + argsString + ")";
+            return "<" + this.getPred() + "(" + argsString + ")>";
         }
         return this.getPred();
     }

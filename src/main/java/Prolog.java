@@ -1,7 +1,6 @@
 import java.io.*;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * User: Johannes Krampf <johkra@gmail.com>
@@ -45,7 +44,7 @@ public final class Prolog {
                 if (line.equals("")) {
                     break;
                 }
-                line = line.replaceAll("#.*", "").replace(" ", "");
+                line = line.replaceAll("#.*", "").replace(" is ", "*is*").replace(" ", "");
                 if (line.equals("")) {
                     continue;
                 }
@@ -164,9 +163,33 @@ public final class Prolog {
                 unify(head, c.getEnv(), currentGoal, parent.getEnv());
                 parent.setInx(parent.getInx() + 1);
                 queue.add(parent);
+                if (trace) {
+                    System.out.println("Requeuing " + parent);
+                }
                 continue;
             }
             Term currentGoal = c.getRule().getGoals().get(c.getInx());
+            String currentPred = currentGoal.getPred();
+            if ((currentPred.equals("*is*")) || currentPred.equals("cut") || currentPred.equals("fail") || currentPred.equals("<") || currentPred.equals("==")) {
+                if (currentPred.equals("*is*")) {
+                    Term ques = eval(term.getArgs().get(0), c.getEnv());
+                    Term ans = eval(term.getArgs().get(1), c.getEnv());
+                    if (ques == null) {
+                        c.getEnv().put(term.getArgs().get(0).getPred(), ans);
+                    } else if (!ques.getPred().equals(ans.getPred())) {
+                        continue;
+                    }
+                } else if (currentPred.equals("cut")) {
+                    queue = new ArrayList<Goal>();
+                } else if (currentPred.equals("fail")) {
+                    continue;
+                } else if (eval(term, c.getEnv()) == null) {
+                    continue;
+                }
+                c.setInx(c.getInx() + 1);
+                queue.add(c);
+                continue;
+            }
             for (Rule rule : rules) {
                 Term head = rule.getHead();
                 if (!head.getPred().equals(currentGoal.getPred())) {
@@ -184,6 +207,16 @@ public final class Prolog {
     }
 
     private static Term eval(Term term, HashMap<String, Term> env) throws ParseException {
+        if(term.getPred().equals("+")) {
+            return new Term(new Integer(Integer.getInteger(eval(term.getArgs().get(0),env).getPred()) + Integer.getInteger(eval(term.getArgs().get(1), env).getPred())).toString(), null);
+        }
+        if(term.getPred().equals("-")) {
+            return new Term(new Integer(Integer.getInteger(eval(term.getArgs().get(0),env).getPred()) - Integer.getInteger(eval(term.getArgs().get(1), env).getPred())).toString(), null);
+        }
+        if(term.getPred().equals("*")) {
+            return new Term(new Integer(Integer.getInteger(eval(term.getArgs().get(0),env).getPred()) * Integer.getInteger(eval(term.getArgs().get(1), env).getPred())).toString(), null);
+        }
+        // TODO: How to set types for lt, eq, original uses booleans
         if (isConstant(term)) {
             return term;
         }
