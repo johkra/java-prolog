@@ -12,13 +12,13 @@ import java.util.Map;
 
     public static List<String> split(String l, String sep, Boolean all) {
         int nest = 0;
-        int lsep = l.length();
+        int lsep = sep.length();
         ArrayList<String> returnValue = new ArrayList<String>();
         if (l.equals("")) {
             return returnValue;
         }
-        for (int i = 0; i < l.length(); i++) {
-            String current = l.substring(i, lsep);
+        for (int i = 0; i <= l.length() - lsep; i++) {
+            String current = l.substring(i, i + lsep);
             if ((nest <= 0) && (current.equals(sep))) {
                 if (all) {
                     returnValue.add(l.substring(0, i));

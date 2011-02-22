@@ -51,8 +51,10 @@ public class Term {
                 this.args = l.args;
             }
         } else if (s.charAt(s.length() - 1) == ')') {
-            List<String> flds = Util.split(s.substring(0,s.length() - 1), "(", false);
+            List<String> flds = Util.split(s, "(", false);
             if (flds.size() != 2) {
+                System.out.println(s.substring(0,s.length() - 1));
+                System.out.println(flds);
                 throw new ParseException("Syntax error in term: '" + s + "'", -1);
             }
             this.pred = flds.get(0);
