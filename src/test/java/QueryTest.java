@@ -51,6 +51,32 @@ public class QueryTest {
         assertEquals("{X=bill}\n", outContent.toString());
     }
 
+    @Test
+    public void testMember() throws Exception {
+       String commands = "member(X,[X|T])\n" +
+               "member(X,[H|T]) :- member(X,T)\n" +
+               "member(a,[a,b,c])?\n" +
+               "member(b,[a,b,c])?\n" +
+               "member(c,[a,b,c])?";
+        byte[] bytes = commands.getBytes("utf-8");
+        ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+        Prolog.procFile(input, "");
+        assertEquals("Yes\nYes\nYes\n", outContent.toString());
+    }
+
+        @Test
+    public void testAppend() throws Exception {
+       String commands = "append([],L,L)\n" +
+               "append([X|A],B,[X|C]) :- append(A,B,C)\n" +
+               "append([a,b],[c,d],X)?";
+        byte[] bytes = commands.getBytes("utf-8");
+        ByteArrayInputStream input = new ByteArrayInputStream(bytes);
+        Prolog.procFile(input, "");
+        assertEquals("{X=[a,b,c,d]}\n", outContent.toString());
+    }
+
+
+
     @After
     public void tearDown() throws Exception {
         System.setOut(null);
