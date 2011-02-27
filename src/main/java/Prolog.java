@@ -31,7 +31,7 @@ public final class Prolog {
         procFile(System.in, "? ");
     }
 
-    private static void procFile(InputStream file, String prompt) {
+    public static void procFile(InputStream file, String prompt) {
         HashMap env = new HashMap<String, String>();
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(file));

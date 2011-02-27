@@ -4,7 +4,7 @@ import java.util.HashMap;
  * User: Johannes Krampf <johkra@gmail.com>
  * Date: 07.02.11
  */
-public class Goal {
+public final class Goal {
     private Rule rule;
     private Goal parent;
     private HashMap<String, Term> env;

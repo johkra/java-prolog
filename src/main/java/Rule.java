@@ -6,7 +6,7 @@ import java.util.List;
  * User: Johannes Krampf <johkra@gmail.com>
  * Date: 06.02.11
  */
-public class Rule {
+public final class Rule {
     private Term head;
     private ArrayList<Term> goals;
 
@@ -16,7 +16,7 @@ public class Rule {
         goals = new ArrayList<Term>();
 
         if (flds.size() == 2) {
-            flds = Util.split(flds.get(0),",",true);
+            flds = Util.split(flds.get(1),",",true);
             for (String fld : flds) {
                 goals.add(new Term(fld, null));
             }
