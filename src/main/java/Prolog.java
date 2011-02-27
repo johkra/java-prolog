@@ -69,6 +69,7 @@ public final class Prolog {
                     }
                 } catch (ParseException e) {
                     System.err.println("err: " + e.getMessage());
+                    e.printStackTrace();
                 }
 
                 if (prompt != null) {
@@ -170,7 +171,8 @@ public final class Prolog {
             }
             Term currentGoal = c.getRule().getGoals().get(c.getInx());
             String currentPred = currentGoal.getPred();
-            if ((currentPred.equals("*is*")) || currentPred.equals("cut") || currentPred.equals("fail") || currentPred.equals("<") || currentPred.equals("==")) {
+            String [] operators = {"*is", "cut", "fail", "<", "=="};
+            if (Arrays.asList(operators).contains(currentPred)) {
                 if (currentPred.equals("*is*")) {
                     Term ques = eval(term.getArgs().get(0), c.getEnv());
                     Term ans = eval(term.getArgs().get(1), c.getEnv());
@@ -207,14 +209,18 @@ public final class Prolog {
     }
 
     private static Term eval(Term term, HashMap<String, Term> env) throws ParseException {
-        if(term.getPred().equals("+")) {
-            return new Term(new Integer(Integer.getInteger(eval(term.getArgs().get(0),env).getPred()) + Integer.getInteger(eval(term.getArgs().get(1), env).getPred())).toString(), null);
-        }
-        if(term.getPred().equals("-")) {
-            return new Term(new Integer(Integer.getInteger(eval(term.getArgs().get(0),env).getPred()) - Integer.getInteger(eval(term.getArgs().get(1), env).getPred())).toString(), null);
-        }
-        if(term.getPred().equals("*")) {
-            return new Term(new Integer(Integer.getInteger(eval(term.getArgs().get(0),env).getPred()) * Integer.getInteger(eval(term.getArgs().get(1), env).getPred())).toString(), null);
+        if (Util.getOperators().contains(term.getPred())) {
+            Integer a = Integer.getInteger(eval(term.getArgs().get(0),env).getPred());
+            Integer b = Integer.getInteger(eval(term.getArgs().get(1), env).getPred());
+            if(term.getPred().equals("+")) {
+                return new Term(new Integer(a + b).toString(), null);
+            }
+            if(term.getPred().equals("-")) {
+                return new Term(new Integer(a - b).toString(), null);
+            }
+            if(term.getPred().equals("*")) {
+                return new Term(new Integer(a * b).toString(), null);
+            }
         }
         // TODO: How to set types for lt, eq, original uses booleans
         if (isConstant(term)) {

@@ -1,7 +1,4 @@
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: Johannes Krampf <johkra@gmail.com>
@@ -9,6 +6,7 @@ import java.util.Map;
  */
  final class Util {
     private Util() {}
+    private static String[] infixOps = {"*is*","==","<",">","+","-","*","/"};
 
     public static List<String> split(String l, String sep, Boolean all) {
         int nest = 0;
@@ -40,8 +38,10 @@ import java.util.Map;
         returnValue.add(l);
         return returnValue;
     }
+    public static List<String> getOperators() {
+        return Arrays.asList(infixOps);
+    }
     public static Map.Entry<String,List<String>> splitInfix(String s) {
-        String[] infixOps = {"*is*","==","<",">","+","-","*","/"};
         for (String op: infixOps) {
             List<String> p = Util.split(s, op, false);
             if (p.size() > 1) {

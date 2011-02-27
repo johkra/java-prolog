@@ -11,12 +11,12 @@ public class Rule {
     private ArrayList<Term> goals;
 
     public Rule(String rule) throws ParseException {
-        String[] flds = rule.split(":-");
-        head = new Term(flds[0], null);
+        List<String> flds = Util.split(rule,":-", false);
+        head = new Term(flds.get(0), null);
         goals = new ArrayList<Term>();
 
-        if (flds.length == 2) {
-            flds = flds[1].split(",");
+        if (flds.size() == 2) {
+            flds = Util.split(flds.get(0),",",true);
             for (String fld : flds) {
                 goals.add(new Term(fld, null));
             }
