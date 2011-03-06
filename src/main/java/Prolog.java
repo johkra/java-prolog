@@ -214,8 +214,8 @@ public final class Prolog {
 
     private static Term eval(Term term, HashMap<String, Term> env) throws ParseException {
         if (Util.getOperators().contains(term.getPred())) {
-            Integer a = Integer.getInteger(eval(term.getArgs().get(0), env).getPred());
-            Integer b = Integer.getInteger(eval(term.getArgs().get(1), env).getPred());
+            Integer a = Integer.parseInt(eval(term.getArgs().get(0), env).getPred());
+            Integer b = Integer.parseInt(eval(term.getArgs().get(1), env).getPred());
             if (term.getPred().equals("+")) {
                 return new Term(new Integer(a + b).toString(), null);
             }
