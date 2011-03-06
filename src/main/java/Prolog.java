@@ -44,14 +44,10 @@ public final class Prolog {
             }
             String line = in.readLine();
             while (line != null) {
+                line = line.replaceAll("#.*", "").replace(" is ", "*is*").replace(" ", "");
                 if (line.equals("")) {
                     break;
                 }
-                line = line.replaceAll("#.*", "").replace(" is ", "*is*").replace(" ", "");
-                if (line.equals("")) {
-                    continue;
-                }
-
                 char last = line.charAt(line.length() - 1);
                 char punc = '.';
                 if (last == '?' || last == '.') {
@@ -74,15 +70,15 @@ public final class Prolog {
                     System.err.println("err: " + e.getMessage());
                     e.printStackTrace();
                 }
-
                 if (prompt != null) {
                     System.out.print(prompt);
                     System.out.flush();
                 }
+
                 line = in.readLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
     }
 
