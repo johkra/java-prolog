@@ -1,13 +1,15 @@
 import java.io.*;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * User: Johannes Krampf <johkra@gmail.com>
  * Date: 07.02.11
- *
+ * <p/>
  * This is a translation of prolog1.py written by Chris Meyers under a copyleft license.
- *
+ * <p/>
  * See http://web.archive.org/web/20071014055005/ibiblio.org/obp/py4fun/prolog/prolog2.html for the code and explanations.
  */
 public final class Prolog {
@@ -15,7 +17,8 @@ public final class Prolog {
     private static Boolean trace = false;
     private static String indent = "";
 
-    private Prolog() {}
+    private Prolog() {
+    }
 
     public static void main(String[] args) {
         for (String file : args) {
@@ -86,13 +89,14 @@ public final class Prolog {
     private static Boolean isVariable(Term term) {
         return ((term.getArgs().size() == 0) && (term.getPred().charAt(0) >= 'A') && (term.getPred().charAt(0) <= 'Z'));
     }
+
     private static Boolean isConstant(Term term) {
-        return ((term.getArgs().size() == 0) && ((term.getPred().charAt(0) < 'A') ||(term.getPred().charAt(0) > 'Z')));
+        return ((term.getArgs().size() == 0) && ((term.getPred().charAt(0) < 'A') || (term.getPred().charAt(0) > 'Z')));
     }
 
     private static Boolean unify(Term src, HashMap<String, Term> srcEnv, Term dest, HashMap<String, Term> destEnv) throws ParseException {
         if (trace) {
-            System.out.println(indent + "Unify " + src + " " + srcEnv + " to " + dest + " " +destEnv);
+            System.out.println(indent + "Unify " + src + " " + srcEnv + " to " + dest + " " + destEnv);
         }
         indent += "  ";
         if (src.getPred().equals("_") || dest.getPred().equals("_")) {
@@ -109,7 +113,7 @@ public final class Prolog {
         if (isVariable(dest)) {
             Term destVal = eval(dest, destEnv);
             if (destVal != null) {
-                return sts(unify(src,srcEnv,destVal,destEnv), "Unify to Dest value");
+                return sts(unify(src, srcEnv, destVal, destEnv), "Unify to Dest value");
             } else {
                 destEnv.put(dest.getPred(), eval(src, srcEnv));
                 return sts(true, "Dest updated");
@@ -121,7 +125,7 @@ public final class Prolog {
         }
         HashMap<String, Term> dde = new HashMap<String, Term>(destEnv);
         for (int i = 0; i < src.getArgs().size(); i++) {
-            if(!unify(src.getArgs().get(i), srcEnv, dest.getArgs().get(i), dde)) {
+            if (!unify(src.getArgs().get(i), srcEnv, dest.getArgs().get(i), dde)) {
                 return sts(false, "Arg doesn't unify");
             }
         }
@@ -171,13 +175,13 @@ public final class Prolog {
             }
             Term currentGoal = c.getRule().getGoals().get(c.getInx());
             String currentPred = currentGoal.getPred();
-            String [] operators = {"*is", "cut", "fail", "<", "=="};
+            String[] operators = {"*is*", "cut", "fail", "<", "=="};
             if (Arrays.asList(operators).contains(currentPred)) {
                 if (currentPred.equals("*is*")) {
-                    Term ques = eval(term.getArgs().get(0), c.getEnv());
-                    Term ans = eval(term.getArgs().get(1), c.getEnv());
+                    Term ques = eval(currentGoal.getArgs().get(0), c.getEnv());
+                    Term ans = eval(currentGoal.getArgs().get(1), c.getEnv());
                     if (ques == null) {
-                        c.getEnv().put(term.getArgs().get(0).getPred(), ans);
+                        c.getEnv().put(currentGoal.getArgs().get(0).getPred(), ans);
                     } else if (!ques.getPred().equals(ans.getPred())) {
                         continue;
                     }
@@ -210,15 +214,15 @@ public final class Prolog {
 
     private static Term eval(Term term, HashMap<String, Term> env) throws ParseException {
         if (Util.getOperators().contains(term.getPred())) {
-            Integer a = Integer.getInteger(eval(term.getArgs().get(0),env).getPred());
+            Integer a = Integer.getInteger(eval(term.getArgs().get(0), env).getPred());
             Integer b = Integer.getInteger(eval(term.getArgs().get(1), env).getPred());
-            if(term.getPred().equals("+")) {
+            if (term.getPred().equals("+")) {
                 return new Term(new Integer(a + b).toString(), null);
             }
-            if(term.getPred().equals("-")) {
+            if (term.getPred().equals("-")) {
                 return new Term(new Integer(a - b).toString(), null);
             }
-            if(term.getPred().equals("*")) {
+            if (term.getPred().equals("*")) {
                 return new Term(new Integer(a * b).toString(), null);
             }
         }
@@ -234,8 +238,8 @@ public final class Prolog {
             return eval(ans, env);
         }
         ArrayList<Term> args = new ArrayList<Term>();
-        for(Term arg: term.getArgs()) {
-            Term a  = eval(arg, env);
+        for (Term arg : term.getArgs()) {
+            Term a = eval(arg, env);
             if (a == null) {
                 return null;
             }
