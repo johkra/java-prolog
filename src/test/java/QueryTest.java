@@ -72,6 +72,22 @@ public class QueryTest {
                 "length([1,2,3],X)?", "{X=0}\n{X=1}\n{X=3}\n");
     }
 
+    @Test
+    public void testWithoutCut() throws Exception {
+        verifyOutput("childOf(X,Y) :- parent(Y,X)\n" +
+                "parent(chris,jon)\n" +
+                "parent(maryann,jon)\n" +
+                "childOf(A,B)?","{A=jon, B=chris}\n" +
+                "{A=jon, B=maryann}\n");
+    }
+
+    @Test
+    public void testFail() throws Exception {
+        verifyOutput("childOfCut(X,Y) :- parent(Y,X),cut\n" +
+                "childOfCut(A,B)?",
+                "{A=jon, B=chris}\n");
+    }
+
     @After
     public void tearDown() throws Exception {
         System.setOut(null);
